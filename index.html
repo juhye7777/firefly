@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>반딧불이</title>
+  <style>
+    :root {
+      --green-bg: #56b86b;
+      --green-deep: #2f8c49;
+      --green-soft: #dff5de;
+      --ink: #123321;
+      --white: #ffffff;
+      --yellow: #ffd35b;
+      --orange: #f0a33d;
+      --wrong: #d94b4b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.28), transparent 28%),
+        linear-gradient(180deg, #69c87c 0%, var(--green-bg) 50%, #3ca457 100%);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+      padding: clamp(14px, 2vw, 28px);
+    }
+
+    header,
+    .controls {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 14px;
+      padding: 16px clamp(16px, 3vw, 28px);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 22px rgba(21, 82, 39, 0.18);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.4vw, 56px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .pill {
+      min-width: 138px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      text-align: center;
+      font-size: clamp(22px, 2.8vw, 34px);
+      font-weight: 900;
+      background: var(--green-soft);
+      color: #176231;
+      border: 3px solid rgba(47, 140, 73, 0.18);
+    }
+
+    .timer {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff7d3;
+      color: #bd6d00;
+      font-size: clamp(30px, 3.4vw, 42px);
+      font-weight: 900;
+      border: 5px solid #f6cc62;
+    }
+
+    main {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+    }
+
+    .stage {
+      width: min(1120px, 100%);
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+    }
+
+    .message {
+      width: 100%;
+      min-height: 90px;
+      display: grid;
+      place-items: center;
+      padding: 12px 22px;
+      border-radius: 18px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 22px rgba(21, 82, 39, 0.18);
+      color: #114323;
+      font-size: clamp(34px, 5vw, 68px);
+      font-weight: 900;
+      line-height: 1.18;
+    }
+
+    .board-wrap {
+      width: min(880px, 94vw);
+      padding: clamp(12px, 2.2vw, 22px);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 6px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 18px 36px rgba(18, 82, 37, 0.28), inset 0 0 0 2px rgba(26, 109, 49, 0.12);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(8px, 1.5vw, 16px);
+      aspect-ratio: 1 / 1;
+    }
+
+    .cell {
+      appearance: none;
+      border: 0;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.64);
+      box-shadow: inset 0 -7px 0 rgba(42, 125, 58, 0.14), 0 6px 14px rgba(30, 93, 46, 0.16);
+      display: grid;
+      place-items: center;
+      padding: 2px;
+      cursor: pointer;
+      transition: transform 140ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .cell:disabled {
+      cursor: default;
+    }
+
+    .cell:not(:disabled):active {
+      transform: scale(0.96);
+    }
+
+    .cell.lit {
+      background: radial-gradient(circle, #fff3a7 0%, #f7cb57 72%, #e6a53d 100%);
+      box-shadow: 0 0 28px rgba(255, 220, 96, 0.88), inset 0 0 0 4px rgba(255, 255, 255, 0.55);
+    }
+
+    .cell.wrong {
+      background: #e75c5c;
+      box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.55), 0 0 22px rgba(140, 28, 28, 0.38);
+    }
+
+    .bulb {
+      width: 96%;
+      height: 96%;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      filter: drop-shadow(0 8px 5px rgba(43, 78, 51, 0.22));
+      background-image: url("data:image/svg+xml,%3Csvg width='300' height='360' viewBox='0 0 300 360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='300' height='360' fill='none'/%3E%3Cg stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M150 22c-66 0-119 53-119 119 0 44 24 82 59 103 10 6 15 16 15 28v16h90v-16c0-12 6-22 16-28 35-21 58-59 58-103 0-66-53-119-119-119z' fill='%23dce7e6' stroke='%234b514d' stroke-width='5'/%3E%3Cpath d='M59 130c5-31 23-58 49-73' fill='none' stroke='%23ffffff' stroke-width='12' opacity='.78'/%3E%3Cpath d='M238 118c5 21 1 43-11 62' fill='none' stroke='%23ffffff' stroke-width='12' opacity='.74'/%3E%3Cpath d='M83 96c8-18 21-33 38-43' fill='none' stroke='%23ffffff' stroke-width='7' opacity='.58'/%3E%3Cpath d='M133 73v169M167 73v169' stroke='%2370675b' stroke-width='5'/%3E%3Cpath d='M150 68c-24 6-43 15-43 27 0 28 86 31 86 59 0 29-86 30-86 59 0 14 19 24 43 29' fill='none' stroke='%23655e54' stroke-width='6'/%3E%3Cpath d='M150 68c24 6 43 15 43 27 0 28-86 31-86 59 0 29 86 30 86 59 0 14-19 24-43 29' fill='none' stroke='%23857a6c' stroke-width='3'/%3E%3Cpath d='M112 255h76v62c0 13-11 24-24 24h-28c-13 0-24-11-24-24z' fill='%23d49b2e' stroke='%234d3a1b' stroke-width='4'/%3E%3Cpath d='M107 268h86M107 282h86M110 296h80M116 310h68M126 324h48' stroke='%23513a16' stroke-width='7'/%3E%3Cpath d='M118 258h64' stroke='%23ffe08a' stroke-width='7' opacity='.75'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .cell.lit .bulb {
+      filter: drop-shadow(0 0 18px rgba(255, 236, 118, 0.95)) drop-shadow(0 8px 5px rgba(95, 66, 0, 0.22));
+      background-image: url("data:image/svg+xml,%3Csvg width='300' height='360' viewBox='0 0 300 360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='300' height='360' fill='none'/%3E%3Cg stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='150' cy='150' rx='134' ry='136' fill='%23ffcf69' opacity='.28'/%3E%3Cpath d='M150 22c-66 0-119 53-119 119 0 44 24 82 59 103 10 6 15 16 15 28v16h90v-16c0-12 6-22 16-28 35-21 58-59 58-103 0-66-53-119-119-119z' fill='%23ffe7a0' stroke='%23705c31' stroke-width='5'/%3E%3Cpath d='M58 130c5-31 23-58 50-73' fill='none' stroke='%23ffffff' stroke-width='13' opacity='.86'/%3E%3Cpath d='M238 118c5 22 1 44-11 63' fill='none' stroke='%23ffffff' stroke-width='13' opacity='.82'/%3E%3Cpath d='M84 96c8-18 21-33 38-43' fill='none' stroke='%23ffffff' stroke-width='7' opacity='.65'/%3E%3Cpath d='M133 73v169M167 73v169' stroke='%23b47b1f' stroke-width='5'/%3E%3Cpath d='M150 68c-24 6-43 15-43 27 0 28 86 31 86 59 0 29-86 30-86 59 0 14 19 24 43 29' fill='none' stroke='%23d69216' stroke-width='7'/%3E%3Cpath d='M150 68c24 6 43 15 43 27 0 28-86 31-86 59 0 29 86 30 86 59 0 14-19 24-43 29' fill='none' stroke='%23ffdf70' stroke-width='4'/%3E%3Cpath d='M112 255h76v62c0 13-11 24-24 24h-28c-13 0-24-11-24-24z' fill='%23d49b2e' stroke='%234d3a1b' stroke-width='4'/%3E%3Cpath d='M107 268h86M107 282h86M110 296h80M116 310h68M126 324h48' stroke='%23513a16' stroke-width='7'/%3E%3Cpath d='M118 258h64' stroke='%23ffe08a' stroke-width='7' opacity='.8'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0 2px;
+    }
+
+    button.action {
+      min-width: 210px;
+      border: 0;
+      border-radius: 14px;
+      padding: 18px 28px;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 900;
+      color: #fff;
+      background: #176231;
+      box-shadow: 0 6px 0 #0d3f1e;
+      cursor: pointer;
+    }
+
+    button.action.secondary {
+      color: #174322;
+      background: #eef8ec;
+      box-shadow: 0 6px 0 #b7d8b3;
+    }
+
+    .status {
+      width: 100%;
+      min-height: 36px;
+      text-align: center;
+      color: #ffffff;
+      font-size: clamp(22px, 2.8vw, 32px);
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(24, 73, 36, 0.32);
+    }
+
+    @media (orientation: landscape) and (max-height: 760px) {
+      .app {
+        gap: 8px;
+        padding: 10px 18px;
+      }
+
+      header {
+        padding: 10px 18px;
+      }
+
+      h1 {
+        font-size: clamp(28px, 3.4vw, 42px);
+      }
+
+      .pill {
+        font-size: clamp(20px, 2.4vw, 28px);
+        padding: 9px 14px;
+      }
+
+      .timer {
+        width: 60px;
+        height: 60px;
+        font-size: 30px;
+      }
+
+      .message {
+        min-height: 66px;
+        font-size: clamp(30px, 4vw, 48px);
+      }
+
+      .board-wrap {
+        width: min(620px, 78vh);
+      }
+
+      button.action {
+        padding: 12px 22px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      header {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      h1 {
+        grid-column: 1 / -1;
+      }
+
+      .timer,
+      .pill {
+        width: 100%;
+      }
+
+      .timer {
+        justify-self: end;
+        width: 68px;
+      }
+
+      .board-wrap {
+        width: min(96vw, 680px);
+        padding: 10px;
+      }
+
+      .board {
+        gap: 8px;
+      }
+
+      .cell {
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>반딧불이</h1>
+      <div class="pill" id="levelText">난이도 1</div>
+      <div class="timer" id="timerText">4</div>
+    </header>
+
+    <main>
+      <section class="stage" aria-label="전구 기억 게임">
+        <div class="message" id="messageText">불이 켜진 전구의 위치를 기억하세요.</div>
+        <div class="board-wrap">
+          <div class="board" id="board" aria-label="전구 16개"></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="controls">
+      <button class="action" id="startButton" type="button">시작하기</button>
+      <button class="action secondary" id="resetButton" type="button">처음부터</button>
+      <div class="status" id="statusText">시작하기를 누르면 전구가 4초 동안 켜집니다.</div>
+    </div>
+  </div>
+
+  <script>
+    const board = document.getElementById("board");
+    const startButton = document.getElementById("startButton");
+    const resetButton = document.getElementById("resetButton");
+    const levelText = document.getElementById("levelText");
+    const timerText = document.getElementById("timerText");
+    const messageText = document.getElementById("messageText");
+    const statusText = document.getElementById("statusText");
+
+    const totalCells = 16;
+    let difficulty = 1;
+    let clearedRounds = 0;
+    let targets = [];
+    let selected = new Set();
+    let acceptingAnswers = false;
+    let timerId = null;
+
+    function makeCell(index) {
+      const button = document.createElement("button");
+      button.className = "cell";
+      button.type = "button";
+      button.dataset.index = String(index);
+      button.setAttribute("aria-label", `${index + 1}번 전구`);
+      button.disabled = true;
+
+      const bulb = document.createElement("span");
+      bulb.className = "bulb";
+      button.appendChild(bulb);
+
+      button.addEventListener("click", () => chooseBulb(index, button));
+      return button;
+    }
+
+    function buildBoard() {
+      board.innerHTML = "";
+
+      for (let i = 0; i < totalCells; i += 1) {
+        board.appendChild(makeCell(i));
+      }
+    }
+
+    function targetCount() {
+      return Math.min(3 + difficulty, 8);
+    }
+
+    function pickTargets() {
+      const pool = Array.from({ length: totalCells }, (_, index) => index);
+      const chosen = [];
+
+      while (chosen.length < targetCount()) {
+        const poolIndex = Math.floor(Math.random() * pool.length);
+        chosen.push(pool.splice(poolIndex, 1)[0]);
+      }
+
+      return chosen;
+    }
+
+    function setBoardDisabled(disabled) {
+      board.querySelectorAll(".cell").forEach((cell) => {
+        cell.disabled = disabled;
+      });
+    }
+
+    function clearBoard() {
+      board.querySelectorAll(".cell").forEach((cell) => {
+        cell.classList.remove("lit", "wrong");
+      });
+    }
+
+    function showTargets() {
+      clearBoard();
+      targets.forEach((index) => {
+        board.children[index].classList.add("lit");
+      });
+    }
+
+    function startRound() {
+      window.clearInterval(timerId);
+      targets = pickTargets();
+      selected = new Set();
+      acceptingAnswers = false;
+
+      levelText.textContent = `난이도 ${difficulty}`;
+      messageText.textContent = "불이 켜진 전구의 위치를 기억하세요.";
+      statusText.textContent = `켜진 전구 ${targets.length}개의 위치를 기억해 주세요.`;
+      startButton.textContent = "다시 보기";
+      setBoardDisabled(true);
+      showTargets();
+
+      let remaining = 4;
+      timerText.textContent = String(remaining);
+
+      timerId = window.setInterval(() => {
+        remaining -= 1;
+        timerText.textContent = String(Math.max(remaining, 0));
+
+        if (remaining <= 0) {
+          window.clearInterval(timerId);
+          hideTargetsAndPlay();
+        }
+      }, 1000);
+    }
+
+    function hideTargetsAndPlay() {
+      clearBoard();
+      acceptingAnswers = true;
+      setBoardDisabled(false);
+      timerText.textContent = "?";
+      messageText.textContent = "불이 켜졌던 전구를 골라주세요.";
+      statusText.textContent = `남은 전구 ${targets.length}개`;
+    }
+
+    function chooseBulb(index, button) {
+      if (!acceptingAnswers || selected.has(index)) {
+        return;
+      }
+
+      selected.add(index);
+
+      if (targets.includes(index)) {
+        button.classList.add("lit");
+        const remaining = targets.length - countCorrect();
+        statusText.textContent = remaining > 0 ? `남은 전구 ${remaining}개` : "모두 찾았습니다.";
+
+        if (remaining === 0) {
+          finishRound();
+        }
+      } else {
+        button.classList.add("wrong");
+        statusText.textContent = "그 자리는 아니에요. 다시 골라주세요.";
+      }
+    }
+
+    function countCorrect() {
+      let count = 0;
+      selected.forEach((index) => {
+        if (targets.includes(index)) {
+          count += 1;
+        }
+      });
+      return count;
+    }
+
+    function finishRound() {
+      acceptingAnswers = false;
+      setBoardDisabled(true);
+      clearedRounds += 1;
+
+      if (clearedRounds % 3 === 0) {
+        difficulty += 1;
+        levelText.textContent = `난이도 ${difficulty}`;
+        statusText.textContent = "3판을 성공해서 난이도가 올라갔습니다.";
+      } else {
+        const leftUntilNext = 3 - (clearedRounds % 3);
+        statusText.textContent = `다음 난이도까지 ${leftUntilNext}판 남았습니다.`;
+      }
+
+      startButton.textContent = "다음 판";
+      messageText.textContent = "잘하셨어요!";
+      timerText.textContent = "✓";
+    }
+
+    function resetGame() {
+      window.clearInterval(timerId);
+      difficulty = 1;
+      clearedRounds = 0;
+      targets = [];
+      selected = new Set();
+      acceptingAnswers = false;
+      clearBoard();
+      setBoardDisabled(true);
+      levelText.textContent = "난이도 1";
+      timerText.textContent = "4";
+      messageText.textContent = "불이 켜진 전구의 위치를 기억하세요.";
+      startButton.textContent = "시작하기";
+      statusText.textContent = "시작하기를 누르면 전구가 4초 동안 켜집니다.";
+    }
+
+    startButton.addEventListener("click", startRound);
+    resetButton.addEventListener("click", resetGame);
+
+    buildBoard();
+    resetGame();
+  </script>
+</body>
+</html>
