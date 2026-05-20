@@ -206,6 +206,16 @@
       box-shadow: 0 6px 0 #b7d8b3;
     }
 
+    button.action.level-up {
+      color: #5a3500;
+      background: #ffe08a;
+      box-shadow: 0 6px 0 #d49b2e;
+    }
+
+    .hidden {
+      display: none;
+    }
+
     .status {
       width: 100%;
       min-height: 36px;
@@ -308,6 +318,7 @@
 
     <div class="controls">
       <button class="action" id="startButton" type="button">시작하기</button>
+      <button class="action level-up hidden" id="levelUpButton" type="button">난이도 올리기</button>
       <button class="action secondary" id="resetButton" type="button">처음부터</button>
       <div class="status" id="statusText">시작하기를 누르면 전구가 4초 동안 켜집니다.</div>
     </div>
@@ -316,6 +327,7 @@
   <script>
     const board = document.getElementById("board");
     const startButton = document.getElementById("startButton");
+    const levelUpButton = document.getElementById("levelUpButton");
     const resetButton = document.getElementById("resetButton");
     const levelText = document.getElementById("levelText");
     const timerText = document.getElementById("timerText");
@@ -323,8 +335,9 @@
     const statusText = document.getElementById("statusText");
 
     const totalCells = 16;
+    const maxDifficulty = 4;
     let difficulty = 1;
-    let clearedRounds = 0;
+    let roundsAtDifficulty = 0;
     let targets = [];
     let selected = new Set();
     let acceptingAnswers = false;
@@ -399,6 +412,7 @@
       messageText.textContent = "불이 켜진 전구의 위치를 기억하세요.";
       statusText.textContent = `켜진 전구 ${targets.length}개의 위치를 기억해 주세요.`;
       startButton.textContent = "다시 보기";
+      levelUpButton.classList.add("hidden");
       setBoardDisabled(true);
       showTargets();
 
@@ -459,15 +473,16 @@
     function finishRound() {
       acceptingAnswers = false;
       setBoardDisabled(true);
-      clearedRounds += 1;
+      roundsAtDifficulty += 1;
 
-      if (clearedRounds % 3 === 0) {
-        difficulty += 1;
-        levelText.textContent = `난이도 ${difficulty}`;
-        statusText.textContent = "3판을 성공해서 난이도가 올라갔습니다.";
+      if (roundsAtDifficulty >= 5 && difficulty < maxDifficulty) {
+        levelUpButton.classList.remove("hidden");
+        statusText.textContent = "5판을 성공했습니다. 난이도를 올릴 수 있습니다.";
+      } else if (roundsAtDifficulty >= 5) {
+        statusText.textContent = "최고 난이도입니다.";
       } else {
-        const leftUntilNext = 3 - (clearedRounds % 3);
-        statusText.textContent = `다음 난이도까지 ${leftUntilNext}판 남았습니다.`;
+        const leftUntilChoice = 5 - roundsAtDifficulty;
+        statusText.textContent = difficulty < maxDifficulty ? `난이도 선택까지 ${leftUntilChoice}판 남았습니다.` : "최고 난이도입니다.";
       }
 
       startButton.textContent = "다음 판";
@@ -475,10 +490,24 @@
       timerText.textContent = "✓";
     }
 
+    function raiseDifficulty() {
+      if (difficulty >= maxDifficulty) {
+        levelUpButton.classList.add("hidden");
+        statusText.textContent = "최고 난이도입니다.";
+        return;
+      }
+
+      difficulty += 1;
+      roundsAtDifficulty = 0;
+      levelText.textContent = `난이도 ${difficulty}`;
+      levelUpButton.classList.add("hidden");
+      statusText.textContent = `난이도 ${difficulty}로 올라갔습니다. 다음 판을 시작해 주세요.`;
+    }
+
     function resetGame() {
       window.clearInterval(timerId);
       difficulty = 1;
-      clearedRounds = 0;
+      roundsAtDifficulty = 0;
       targets = [];
       selected = new Set();
       acceptingAnswers = false;
@@ -488,10 +517,12 @@
       timerText.textContent = "4";
       messageText.textContent = "불이 켜진 전구의 위치를 기억하세요.";
       startButton.textContent = "시작하기";
+      levelUpButton.classList.add("hidden");
       statusText.textContent = "시작하기를 누르면 전구가 4초 동안 켜집니다.";
     }
 
     startButton.addEventListener("click", startRound);
+    levelUpButton.addEventListener("click", raiseDifficulty);
     resetButton.addEventListener("click", resetGame);
 
     buildBoard();
