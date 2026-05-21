@@ -154,8 +154,8 @@
     }
 
     .cell.lit {
-      background: radial-gradient(circle, #fff3a7 0%, #f7cb57 72%, #e6a53d 100%);
-      box-shadow: 0 0 28px rgba(255, 220, 96, 0.88), inset 0 0 0 4px rgba(255, 255, 255, 0.55);
+      background: rgba(255, 255, 255, 0.64);
+      box-shadow: 0 0 30px rgba(255, 220, 96, 0.9), inset 0 -7px 0 rgba(42, 125, 58, 0.14);
     }
 
     .cell.wrong {
@@ -166,16 +166,13 @@
     .bulb {
       width: 96%;
       height: 96%;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
+      object-fit: contain;
       filter: drop-shadow(0 8px 5px rgba(43, 78, 51, 0.22));
-      background-image: url("data:image/svg+xml,%3Csvg width='300' height='360' viewBox='0 0 300 360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='300' height='360' fill='none'/%3E%3Cg stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M150 22c-66 0-119 53-119 119 0 44 24 82 59 103 10 6 15 16 15 28v16h90v-16c0-12 6-22 16-28 35-21 58-59 58-103 0-66-53-119-119-119z' fill='%23dce7e6' stroke='%234b514d' stroke-width='5'/%3E%3Cpath d='M59 130c5-31 23-58 49-73' fill='none' stroke='%23ffffff' stroke-width='12' opacity='.78'/%3E%3Cpath d='M238 118c5 21 1 43-11 62' fill='none' stroke='%23ffffff' stroke-width='12' opacity='.74'/%3E%3Cpath d='M83 96c8-18 21-33 38-43' fill='none' stroke='%23ffffff' stroke-width='7' opacity='.58'/%3E%3Cpath d='M133 73v169M167 73v169' stroke='%2370675b' stroke-width='5'/%3E%3Cpath d='M150 68c-24 6-43 15-43 27 0 28 86 31 86 59 0 29-86 30-86 59 0 14 19 24 43 29' fill='none' stroke='%23655e54' stroke-width='6'/%3E%3Cpath d='M150 68c24 6 43 15 43 27 0 28-86 31-86 59 0 29 86 30 86 59 0 14-19 24-43 29' fill='none' stroke='%23857a6c' stroke-width='3'/%3E%3Cpath d='M112 255h76v62c0 13-11 24-24 24h-28c-13 0-24-11-24-24z' fill='%23d49b2e' stroke='%234d3a1b' stroke-width='4'/%3E%3Cpath d='M107 268h86M107 282h86M110 296h80M116 310h68M126 324h48' stroke='%23513a16' stroke-width='7'/%3E%3Cpath d='M118 258h64' stroke='%23ffe08a' stroke-width='7' opacity='.75'/%3E%3C/g%3E%3C/svg%3E");
+      display: block;
     }
 
     .cell.lit .bulb {
       filter: drop-shadow(0 0 18px rgba(255, 236, 118, 0.95)) drop-shadow(0 8px 5px rgba(95, 66, 0, 0.22));
-      background-image: url("data:image/svg+xml,%3Csvg width='300' height='360' viewBox='0 0 300 360' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='300' height='360' fill='none'/%3E%3Cg stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='150' cy='150' rx='134' ry='136' fill='%23ffcf69' opacity='.28'/%3E%3Cpath d='M150 22c-66 0-119 53-119 119 0 44 24 82 59 103 10 6 15 16 15 28v16h90v-16c0-12 6-22 16-28 35-21 58-59 58-103 0-66-53-119-119-119z' fill='%23ffe7a0' stroke='%23705c31' stroke-width='5'/%3E%3Cpath d='M58 130c5-31 23-58 50-73' fill='none' stroke='%23ffffff' stroke-width='13' opacity='.86'/%3E%3Cpath d='M238 118c5 22 1 44-11 63' fill='none' stroke='%23ffffff' stroke-width='13' opacity='.82'/%3E%3Cpath d='M84 96c8-18 21-33 38-43' fill='none' stroke='%23ffffff' stroke-width='7' opacity='.65'/%3E%3Cpath d='M133 73v169M167 73v169' stroke='%23b47b1f' stroke-width='5'/%3E%3Cpath d='M150 68c-24 6-43 15-43 27 0 28 86 31 86 59 0 29-86 30-86 59 0 14 19 24 43 29' fill='none' stroke='%23d69216' stroke-width='7'/%3E%3Cpath d='M150 68c24 6 43 15 43 27 0 28-86 31-86 59 0 29 86 30 86 59 0 14-19 24-43 29' fill='none' stroke='%23ffdf70' stroke-width='4'/%3E%3Cpath d='M112 255h76v62c0 13-11 24-24 24h-28c-13 0-24-11-24-24z' fill='%23d49b2e' stroke='%234d3a1b' stroke-width='4'/%3E%3Cpath d='M107 268h86M107 282h86M110 296h80M116 310h68M126 324h48' stroke='%23513a16' stroke-width='7'/%3E%3Cpath d='M118 258h64' stroke='%23ffe08a' stroke-width='7' opacity='.8'/%3E%3C/g%3E%3C/svg%3E");
     }
 
     .controls {
@@ -351,8 +348,10 @@
       button.setAttribute("aria-label", `${index + 1}번 전구`);
       button.disabled = true;
 
-      const bulb = document.createElement("span");
+      const bulb = document.createElement("img");
       bulb.className = "bulb";
+      bulb.src = "bulb-off.png";
+      bulb.alt = "";
       button.appendChild(bulb);
 
       button.addEventListener("click", () => chooseBulb(index, button));
@@ -392,6 +391,7 @@
     function clearBoard() {
       board.querySelectorAll(".cell").forEach((cell) => {
         cell.classList.remove("lit", "wrong");
+        cell.querySelector(".bulb").src = "bulb-off.png";
       });
     }
 
@@ -399,6 +399,7 @@
       clearBoard();
       targets.forEach((index) => {
         board.children[index].classList.add("lit");
+        board.children[index].querySelector(".bulb").src = "bulb-on.png";
       });
     }
 
@@ -448,6 +449,7 @@
 
       if (targets.includes(index)) {
         button.classList.add("lit");
+        button.querySelector(".bulb").src = "bulb-on.png";
         const remaining = targets.length - countCorrect();
         statusText.textContent = remaining > 0 ? `남은 전구 ${remaining}개` : "모두 찾았습니다.";
 
