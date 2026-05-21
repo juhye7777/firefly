@@ -7,131 +7,204 @@
   <style>
     :root {
       --green-bg: #56b86b;
+      --green-deep: #2f8c49;
       --green-soft: #dff5de;
       --ink: #123321;
-      --wrong: #d94b4b;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      width: 100%;
+      min-width: 960px;
+      min-height: 100vh;
+    }
+
     body {
       margin: 0;
-      min-height: 100vh;
       font-family: "Noto Sans KR", "Malgun Gothic", Arial, sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.28), transparent 28%),
-        linear-gradient(180deg, #69c87c 0%, var(--green-bg) 50%, #3ca457 100%);
+        radial-gradient(circle at 16% 14%, rgba(255, 255, 255, 0.3), transparent 30%),
+        linear-gradient(135deg, #73cf83 0%, var(--green-bg) 50%, #31984f 100%);
+      overflow: hidden;
     }
 
     .app {
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      min-width: 960px;
+      min-height: 560px;
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 14px;
-      padding: clamp(14px, 2vw, 28px);
-    }
-
-    header,
-    .controls {
-      width: min(1120px, 100%);
-      margin: 0 auto;
+      grid-template-columns: minmax(330px, 36vw) minmax(560px, 1fr);
+      gap: clamp(16px, 2vw, 30px);
+      padding: clamp(16px, 2vw, 28px);
     }
 
     header {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      align-items: center;
-      gap: 14px;
-      padding: 16px clamp(16px, 3vw, 28px);
-      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(14px, 2vh, 22px);
+      min-height: 0;
+      padding: clamp(18px, 2vw, 30px);
+      border-radius: 24px;
       background: rgba(255, 255, 255, 0.9);
-      box-shadow: 0 8px 22px rgba(21, 82, 39, 0.18);
+      box-shadow: 0 18px 36px rgba(18, 82, 37, 0.22);
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(32px, 4.4vw, 56px);
-      line-height: 1.08;
+      width: 100%;
+      padding: 8px 6px 14px;
+      border-bottom: 4px solid rgba(47, 140, 73, 0.14);
+      font-size: clamp(34px, 3.35vw, 58px);
+      line-height: 1.1;
       letter-spacing: 0;
+      white-space: nowrap;
+      text-align: center;
+      color: #0f3e22;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 1fr 112px;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .pill,
+    .timer {
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      font-weight: 900;
+      min-height: 86px;
     }
 
     .pill {
-      min-width: 138px;
-      padding: 13px 18px;
-      border-radius: 999px;
-      text-align: center;
-      font-size: clamp(22px, 2.8vw, 34px);
-      font-weight: 900;
+      padding: 12px 18px;
+      font-size: clamp(28px, 3vw, 46px);
       background: var(--green-soft);
       color: #176231;
-      border: 3px solid rgba(47, 140, 73, 0.18);
+      border: 4px solid rgba(47, 140, 73, 0.18);
     }
 
     .timer {
-      width: 76px;
-      height: 76px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
       background: #fff7d3;
       color: #bd6d00;
-      font-size: clamp(30px, 3.4vw, 42px);
-      font-weight: 900;
-      border: 5px solid #f6cc62;
-    }
-
-    main {
-      display: grid;
-      place-items: center;
-      min-height: 0;
-    }
-
-    .stage {
-      width: min(1120px, 100%);
-      display: grid;
-      gap: 18px;
-      justify-items: center;
+      font-size: clamp(42px, 4vw, 62px);
+      border: 6px solid #f6cc62;
     }
 
     .message {
-      width: 100%;
-      min-height: 90px;
+      flex: 1;
+      min-height: 190px;
       display: grid;
       place-items: center;
-      padding: 12px 22px;
+      padding: clamp(18px, 2.2vw, 30px);
+      border-radius: 22px;
+      text-align: center;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 4px rgba(47, 140, 73, 0.1);
+      color: #114323;
+      font-size: clamp(36px, 4vw, 64px);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    button.action {
+      width: 100%;
+      min-height: 72px;
+      border: 0;
+      border-radius: 16px;
+      padding: 16px 24px;
+      font-size: clamp(28px, 2.8vw, 42px);
+      font-weight: 900;
+      color: #fff;
+      background: #176231;
+      box-shadow: 0 6px 0 #0d3f1e;
+      cursor: pointer;
+    }
+
+    button.action.secondary {
+      color: #174322;
+      background: #eef8ec;
+      box-shadow: 0 6px 0 #b7d8b3;
+    }
+
+    button.action.level-up {
+      color: #5a3500;
+      background: #ffe08a;
+      box-shadow: 0 6px 0 #d49b2e;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .status {
+      min-height: 64px;
+      display: grid;
+      place-items: center;
+      padding: 8px 10px;
       border-radius: 18px;
       text-align: center;
-      background: rgba(255, 255, 255, 0.92);
-      box-shadow: 0 8px 22px rgba(21, 82, 39, 0.18);
-      color: #114323;
-      font-size: clamp(34px, 5vw, 68px);
+      color: #ffffff;
+      background: rgba(18, 72, 34, 0.24);
+      font-size: clamp(24px, 2.4vw, 38px);
       font-weight: 900;
-      line-height: 1.18;
+      line-height: 1.2;
+      text-shadow: 0 2px 4px rgba(24, 73, 36, 0.32);
+    }
+
+    main {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .stage {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      place-items: center;
     }
 
     .board-wrap {
-      width: min(880px, 94vw);
-      padding: clamp(12px, 2.2vw, 22px);
-      border-radius: 24px;
+      width: min(100%, calc(100vh - clamp(32px, 4vw, 56px)));
+      max-width: 980px;
+      aspect-ratio: 1 / 1;
+      padding: clamp(12px, 1.4vw, 20px);
+      border-radius: 28px;
       background: rgba(255, 255, 255, 0.28);
-      border: 6px solid rgba(255, 255, 255, 0.7);
-      box-shadow: 0 18px 36px rgba(18, 82, 37, 0.28), inset 0 0 0 2px rgba(26, 109, 49, 0.12);
+      border: 7px solid rgba(255, 255, 255, 0.72);
+      box-shadow: 0 22px 42px rgba(18, 82, 37, 0.3), inset 0 0 0 2px rgba(26, 109, 49, 0.12);
     }
 
     .board {
+      width: 100%;
+      height: 100%;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: clamp(8px, 1.5vw, 16px);
-      aspect-ratio: 1 / 1;
+      gap: clamp(8px, 1.3vw, 16px);
     }
 
     .cell {
       appearance: none;
       border: 0;
-      border-radius: 18px;
+      border-radius: 20px;
       background: rgba(255, 255, 255, 0.64);
       box-shadow: inset 0 -7px 0 rgba(42, 125, 58, 0.14), 0 6px 14px rgba(30, 93, 46, 0.16);
       display: grid;
@@ -174,151 +247,33 @@
     .cell.lit .bulb {
       filter: drop-shadow(0 0 18px rgba(255, 236, 118, 0.95)) drop-shadow(0 8px 5px rgba(95, 66, 0, 0.22));
     }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0 2px;
-    }
-
-    button.action {
-      min-width: 210px;
-      border: 0;
-      border-radius: 14px;
-      padding: 18px 28px;
-      font-size: clamp(24px, 3vw, 34px);
-      font-weight: 900;
-      color: #fff;
-      background: #176231;
-      box-shadow: 0 6px 0 #0d3f1e;
-      cursor: pointer;
-    }
-
-    button.action.secondary {
-      color: #174322;
-      background: #eef8ec;
-      box-shadow: 0 6px 0 #b7d8b3;
-    }
-
-    button.action.level-up {
-      color: #5a3500;
-      background: #ffe08a;
-      box-shadow: 0 6px 0 #d49b2e;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .status {
-      width: 100%;
-      min-height: 36px;
-      text-align: center;
-      color: #ffffff;
-      font-size: clamp(22px, 2.8vw, 32px);
-      font-weight: 900;
-      text-shadow: 0 2px 4px rgba(24, 73, 36, 0.32);
-    }
-
-    @media (orientation: landscape) and (max-height: 760px) {
-      .app {
-        gap: 8px;
-        padding: 10px 18px;
-      }
-
-      header {
-        padding: 10px 18px;
-      }
-
-      h1 {
-        font-size: clamp(28px, 3.4vw, 42px);
-      }
-
-      .pill {
-        font-size: clamp(20px, 2.4vw, 28px);
-        padding: 9px 14px;
-      }
-
-      .timer {
-        width: 60px;
-        height: 60px;
-        font-size: 30px;
-      }
-
-      .message {
-        min-height: 66px;
-        font-size: clamp(30px, 4vw, 48px);
-      }
-
-      .board-wrap {
-        width: min(620px, 78vh);
-      }
-
-      button.action {
-        padding: 12px 22px;
-      }
-    }
-
-    @media (max-width: 700px) {
-      header {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      h1 {
-        grid-column: 1 / -1;
-      }
-
-      .timer,
-      .pill {
-        width: 100%;
-      }
-
-      .timer {
-        justify-self: end;
-        width: 68px;
-      }
-
-      .board-wrap {
-        width: min(96vw, 680px);
-        padding: 10px;
-      }
-
-      .board {
-        gap: 8px;
-      }
-
-      .cell {
-        border-radius: 14px;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="app">
     <header>
       <h1>빛나는 전구를 찾아라</h1>
-      <div class="pill" id="levelText">난이도 1</div>
-      <div class="timer" id="timerText">4</div>
+      <div class="info-row">
+        <div class="pill" id="levelText">난이도 1</div>
+        <div class="timer" id="timerText">4</div>
+      </div>
+      <div class="message" id="messageText">불이 켜진 전구의 위치를 기억하세요.</div>
+      <div class="controls">
+        <button class="action" id="startButton" type="button">시작하기</button>
+        <button class="action level-up hidden" id="levelUpButton" type="button">난이도 올리기</button>
+        <button class="action secondary" id="resetButton" type="button">처음부터</button>
+        <div class="status" id="statusText">시작하기를 누르면 전구가 4초 동안 켜집니다.</div>
+      </div>
     </header>
 
     <main>
       <section class="stage" aria-label="전구 기억 게임">
-        <div class="message" id="messageText">불이 켜진 전구의 위치를 기억하세요.</div>
         <div class="board-wrap">
           <div class="board" id="board" aria-label="전구 16개"></div>
         </div>
       </section>
     </main>
-
-    <div class="controls">
-      <button class="action" id="startButton" type="button">시작하기</button>
-      <button class="action level-up hidden" id="levelUpButton" type="button">난이도 올리기</button>
-      <button class="action secondary" id="resetButton" type="button">처음부터</button>
-      <div class="status" id="statusText">시작하기를 누르면 전구가 4초 동안 켜집니다.</div>
-    </div>
+  </div>
   </div>
 
   <script>
@@ -443,7 +398,7 @@
       clearBoard();
       acceptingAnswers = true;
       setBoardDisabled(false);
-      timerText.textContent = "?";
+      timerText.textContent = "선택";
       messageText.textContent = "불이 켜졌던 전구를 골라주세요.";
       statusText.textContent = "남은 전구 " + targets.length + "개";
     }
@@ -498,7 +453,7 @@
 
       startButton.textContent = "다음 판";
       messageText.textContent = "잘하셨어요!";
-      timerText.textContent = "✓";
+      timerText.textContent = "완료";
     }
 
     function raiseDifficulty() {
