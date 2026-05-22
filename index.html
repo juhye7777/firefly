@@ -482,11 +482,14 @@
       });
     }
 
-    function clearBoard() {
+    function clearBoard(resetItems = true) {
       const setting = difficultySettings[currentDifficulty];
       board.style.setProperty("--grid-size", setting.gridSize);
       board.innerHTML = "";
-      boardItems = Array.from({ length: setting.gridSize * setting.gridSize }, () => "off");
+      const total = setting.gridSize * setting.gridSize;
+      if (resetItems || boardItems.length !== total) {
+        boardItems = Array.from({ length: total }, () => "off");
+      }
       boardItems.forEach((type, index) => {
         const cell = document.createElement("button");
         cell.className = "cell";
@@ -718,7 +721,7 @@
       startButton.disabled = true;
       hintButton.disabled = true;
       setPauseReady(true);
-      clearBoard();
+      clearBoard(false);
       renderBoard("preview");
       updateRemaining();
       startPreviewCountdown();
