@@ -391,12 +391,18 @@
       width: min(1080px, 94vw);
     }
 
+    .checkin-card {
+      width: min(1040px, 94vw);
+      text-align: left;
+    }
+
     .modal-card h2 {
       margin: 0 0 28px;
       color: #0f351f;
       font-size: clamp(34px, 4vw, 52px);
       line-height: 1.15;
       word-break: keep-all;
+      text-align: center;
     }
 
     .modal-actions {
@@ -410,6 +416,52 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(18px, 2.2vw, 30px);
       align-items: stretch;
+    }
+
+    .checkin-section {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .checkin-section strong {
+      color: #10361f;
+      font-size: clamp(24px, 2.2vw, 34px);
+      line-height: 1.2;
+    }
+
+    .checkin-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .checkin-options button {
+      min-height: 92px;
+      padding: 14px 16px;
+      white-space: normal;
+      line-height: 1.16;
+      font-size: clamp(22px, 2vw, 30px);
+    }
+
+    .checkin-options button.active {
+      background:
+        radial-gradient(circle at 24% 16%, rgba(255, 255, 255, .62), transparent 34%),
+        linear-gradient(180deg, #ffe994 0%, #ffd75d 55%, #e4ad35 100%);
+      color: #563d00;
+      outline: 5px solid #236d3d;
+      outline-offset: 3px;
+    }
+
+    .checkin-note {
+      display: block;
+      margin: -6px 0 24px;
+      color: #315744;
+      font-size: clamp(19px, 1.5vw, 24px);
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: center;
+      word-break: keep-all;
     }
 
     .difficulty-choice {
@@ -1722,6 +1774,32 @@
     </div>
   </div>
 
+  <div id="checkinModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="checkinTitle">
+    <div class="modal-card checkin-card">
+      <h2 id="checkinTitle">오늘 상태를 알려주세요.</h2>
+      <span class="checkin-note">게임을 시작하기 전에 오늘의 기분과 수면시간을 가볍게 확인합니다.</span>
+      <div class="checkin-section">
+        <strong>오늘 기분은 어떠세요?</strong>
+        <div class="checkin-options" role="group" aria-label="오늘 기분">
+          <button type="button" data-mood="좋음">좋음</button>
+          <button type="button" data-mood="보통">보통</button>
+          <button type="button" data-mood="나쁨">나쁨</button>
+        </div>
+      </div>
+      <div class="checkin-section">
+        <strong>어젯밤 수면시간은 어느 정도였나요?</strong>
+        <div class="checkin-options" role="group" aria-label="수면시간">
+          <button type="button" data-sleep="5시간 미만">5시간 미만</button>
+          <button type="button" data-sleep="5시간~10시간 미만">5시간~10시간 미만</button>
+          <button type="button" data-sleep="10시간 이상">10시간 이상</button>
+        </div>
+      </div>
+      <div class="modal-actions single-action">
+        <button id="checkinNextButton" class="primary" type="button" disabled>다음</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tutorialModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
     <div class="modal-card tutorial-card">
       <h2 id="tutorialTitle">게임 방법 보기</h2>
@@ -1861,6 +1939,7 @@
     const tutorialModal = document.getElementById("tutorialModal");
     const settingsModal = document.getElementById("settingsModal");
     const themeModal = document.getElementById("themeModal");
+    const checkinModal = document.getElementById("checkinModal");
     const pauseModal = document.getElementById("pauseModal");
     const introStartButton = document.getElementById("introStartButton");
     const introSettingsButton = document.getElementById("introSettingsButton");
@@ -1872,6 +1951,9 @@
     const settingsBackButton = document.getElementById("settingsBackButton");
     const themeBackButton = document.getElementById("themeBackButton");
     const themeOptionButtons = [...document.querySelectorAll("[data-theme-option]")];
+    const moodButtons = [...document.querySelectorAll("[data-mood]")];
+    const sleepButtons = [...document.querySelectorAll("[data-sleep]")];
+    const checkinNextButton = document.getElementById("checkinNextButton");
     const skipTutorialButton = document.getElementById("skipTutorialButton");
     const tutorialNextButton = document.getElementById("tutorialNextButton");
     const tutorialPageText = document.getElementById("tutorialPageText");
@@ -1925,6 +2007,8 @@
     let musicEnabled = true;
     let soundEnabled = true;
     let voiceEnabled = true;
+    let todayMood = "";
+    let sleepTime = "";
     let tutorialReturnTarget = "difficulty";
     let tutorialStepIndex = 0;
     let currentPhase = "home";
@@ -1997,6 +2081,20 @@
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
       });
+    }
+
+    function updateCheckinButtons() {
+      moodButtons.forEach((button) => {
+        const active = button.dataset.mood === todayMood;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      sleepButtons.forEach((button) => {
+        const active = button.dataset.sleep === sleepTime;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+      checkinNextButton.disabled = !(todayMood && sleepTime);
     }
 
     function speakGuide(text, interrupt = true) {
@@ -2219,9 +2317,21 @@
     function showIntroScreen() {
       introModal.classList.add("open");
       difficultyModal.classList.remove("open");
+      checkinModal.classList.remove("open");
       tutorialModal.classList.remove("open");
       settingsModal.classList.remove("open");
       themeModal.classList.remove("open");
+    }
+
+    function showCheckinScreen() {
+      introModal.classList.remove("open");
+      tutorialModal.classList.remove("open");
+      settingsModal.classList.remove("open");
+      themeModal.classList.remove("open");
+      difficultyModal.classList.remove("open");
+      checkinModal.classList.add("open");
+      updateCheckinButtons();
+      speakGuide("게임을 시작하기 전에 오늘의 기분과 수면시간을 선택해 주세요.");
     }
 
     function showDifficultyScreen() {
@@ -2229,6 +2339,7 @@
       tutorialModal.classList.remove("open");
       settingsModal.classList.remove("open");
       themeModal.classList.remove("open");
+      checkinModal.classList.remove("open");
       difficultyModal.classList.add("open");
       speakGuide("난이도를 골라주세요. 쉬움, 보통, 어려움 중에서 선택할 수 있습니다.");
     }
@@ -2703,7 +2814,7 @@
     hintButton.addEventListener("click", showHint);
     pauseButton.addEventListener("click", togglePause);
     resetButton.addEventListener("click", openHomeConfirm);
-    introStartButton.addEventListener("click", showDifficultyScreen);
+    introStartButton.addEventListener("click", showCheckinScreen);
     introSettingsButton.addEventListener("click", () => {
       settingsModal.classList.add("open");
       speakGuide("설정 화면입니다. 테마, 음악, 효과음, 음성 안내를 바꿀 수 있습니다.");
@@ -2746,6 +2857,24 @@
         settingsModal.classList.add("open");
         speakGuide(`${objectTypes.yellow.label} 테마로 바꾸었습니다.`);
       });
+    });
+    moodButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        todayMood = button.dataset.mood;
+        updateCheckinButtons();
+        speakGuide(`오늘 기분은 ${todayMood}으로 선택했습니다.`);
+      });
+    });
+    sleepButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        sleepTime = button.dataset.sleep;
+        updateCheckinButtons();
+        speakGuide(`수면시간은 ${sleepTime}으로 선택했습니다.`);
+      });
+    });
+    checkinNextButton.addEventListener("click", () => {
+      if (!todayMood || !sleepTime) return;
+      showDifficultyScreen();
     });
     skipTutorialButton.addEventListener("click", () => {
       closeTutorial();
