@@ -1230,6 +1230,73 @@
       }
     }
 
+    @media (min-width: 901px) {
+      .tutorial-card {
+        width: min(1220px, 92vw);
+        max-height: calc(100dvh - 48px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: clamp(18px, 2vw, 30px);
+      }
+
+      .tutorial-card h2 {
+        margin-bottom: clamp(8px, 1vw, 14px);
+        font-size: clamp(34px, 2.8vw, 46px);
+        line-height: 1.04;
+      }
+
+      .tutorial-card .tutorial-box {
+        flex: none;
+        height: min(600px, calc(100dvh - 218px));
+        min-height: 0;
+        grid-template-columns: minmax(0, .95fr) minmax(280px, 420px);
+        grid-template-rows: auto auto minmax(0, 1fr);
+        align-items: center;
+        gap: clamp(12px, 1.5vw, 22px);
+        margin: 0 0 clamp(10px, 1.1vw, 14px);
+        padding: clamp(16px, 1.5vw, 24px);
+        overflow: hidden;
+        font-size: clamp(21px, 1.55vw, 28px);
+        line-height: 1.24;
+      }
+
+      .tutorial-title {
+        font-size: clamp(28px, 2vw, 36px);
+      }
+
+      .tutorial-desc {
+        font-size: clamp(21px, 1.5vw, 27px);
+      }
+
+      .tutorial-card .tutorial-demo {
+        width: min(100%, 380px, calc(100dvh - 318px));
+        max-height: 100%;
+        padding: 10px;
+        align-self: center;
+      }
+
+      .tutorial-demo-grid {
+        gap: 8px;
+      }
+
+      .tutorial-demo-cell {
+        border-width: 3px;
+        border-radius: 16px;
+      }
+
+      .tutorial-demo-caption {
+        margin-top: 7px;
+        font-size: clamp(16px, 1.05vw, 21px);
+        line-height: 1.12;
+      }
+
+      .tutorial-card .modal-actions button {
+        min-height: clamp(58px, 6.2vh, 72px);
+        font-size: clamp(24px, 1.9vw, 34px);
+      }
+    }
+
     .settings-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1748,6 +1815,36 @@
     .theme-bird .cell.object-flower .object-img,
     .theme-phone .cell.object-flower .object-img {
       --object-size: 230%;
+    }
+
+    @media (min-width: 901px) {
+      .theme-bulb .board[data-grid-size="2"] .object-img {
+        --object-size: 145%;
+      }
+
+      .theme-bird .board[data-grid-size="2"] .object-img {
+        --object-size: 122%;
+      }
+
+      .theme-phone .board[data-grid-size="2"] .object-img,
+      .theme-flower .board[data-grid-size="2"] .object-img,
+      .board[data-grid-size="2"] .cell.object-flower .object-img {
+        --object-size: 132%;
+      }
+
+      .theme-bulb .board[data-grid-size="3"] .object-img {
+        --object-size: 205%;
+      }
+
+      .theme-bird .board[data-grid-size="3"] .object-img {
+        --object-size: 172%;
+      }
+
+      .theme-phone .board[data-grid-size="3"] .object-img,
+      .theme-flower .board[data-grid-size="3"] .object-img,
+      .board[data-grid-size="3"] .cell.object-flower .object-img {
+        --object-size: 184%;
+      }
     }
 
     .cell.object-yellow .object-img,
