@@ -467,6 +467,87 @@
       outline-offset: 3px;
     }
 
+    .sleep-dial {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 92px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .sleep-window {
+      min-height: 150px;
+      display: grid;
+      grid-template-rows: 1fr 1.18fr 1fr;
+      align-items: center;
+      justify-items: center;
+      border-radius: 22px;
+      border: 4px solid #d4a83d;
+      background:
+        linear-gradient(180deg, rgba(67, 42, 13, .26) 0%, rgba(255, 244, 203, .88) 31%, rgba(255, 234, 153, .98) 50%, rgba(255, 244, 203, .88) 69%, rgba(67, 42, 13, .26) 100%);
+      box-shadow:
+        inset 0 8px 14px rgba(48, 30, 9, .22),
+        inset 0 -8px 14px rgba(48, 30, 9, .18),
+        0 12px 20px rgba(31, 78, 43, .18);
+      overflow: hidden;
+    }
+
+    .sleep-window strong,
+    .sleep-neighbor {
+      width: 100%;
+      text-align: center;
+      color: #714b15;
+      font-weight: 1000;
+      line-height: 1;
+      word-break: keep-all;
+    }
+
+    .sleep-window strong {
+      padding: 14px 0;
+      border-top: 3px solid rgba(255, 211, 82, .9);
+      border-bottom: 3px solid rgba(255, 211, 82, .9);
+      background: rgba(255, 248, 213, .76);
+      color: #26733e;
+      font-size: clamp(30px, 3.4vw, 44px);
+      text-shadow: 0 2px 0 rgba(255, 255, 255, .8);
+    }
+
+    .sleep-neighbor {
+      color: rgba(91, 65, 38, .66);
+      padding: 0 12px;
+      font-size: clamp(18px, 1.8vw, 26px);
+      line-height: 1.18;
+      white-space: normal;
+    }
+
+    .sleep-controls {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .sleep-step {
+      min-height: 68px;
+      padding: 0;
+      border-radius: 24px;
+      border: 4px solid #e2c15b;
+      background:
+        radial-gradient(circle at 32% 18%, rgba(255, 255, 255, .76), transparent 35%),
+        linear-gradient(180deg, #fff5b4 0%, #f7d75a 58%, #c99a22 100%);
+      color: #28733c;
+      font-size: clamp(30px, 3vw, 42px);
+      line-height: 1;
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, .72),
+        inset 0 -9px 13px rgba(147, 96, 0, .17),
+        0 9px 0 rgba(35, 95, 54, .24);
+    }
+
+    .sleep-step:disabled {
+      color: rgba(40, 115, 60, .35);
+      filter: grayscale(.28);
+      opacity: .58;
+    }
+
     .checkin-note {
       display: block;
       margin: -6px 0 24px;
@@ -1917,6 +1998,39 @@
         line-height: 1.08;
       }
 
+      .sleep-dial {
+        grid-template-columns: minmax(0, 1fr) clamp(56px, 15vw, 72px);
+        gap: 10px;
+      }
+
+      .sleep-window {
+        min-height: clamp(104px, 18vh, 132px);
+        border-width: 3px;
+        border-radius: 18px;
+      }
+
+      .sleep-window strong {
+        padding: 9px 0;
+        font-size: clamp(25px, 7vw, 33px);
+      }
+
+      .sleep-neighbor {
+        padding: 0 8px;
+        font-size: clamp(14px, 3.8vw, 18px);
+        line-height: 1.15;
+      }
+
+      .sleep-controls {
+        gap: 9px;
+      }
+
+      .sleep-step {
+        min-height: 48px;
+        border-width: 3px;
+        border-radius: 18px;
+        font-size: clamp(24px, 6.8vw, 32px);
+      }
+
       .difficulty-choice {
         min-height: clamp(112px, 18vh, 150px);
         padding: clamp(10px, 2vh, 16px);
@@ -2272,6 +2386,18 @@
         min-height: 46px;
       }
 
+      .sleep-window {
+        min-height: 98px;
+      }
+
+      .sleep-window strong {
+        padding: 7px 0;
+      }
+
+      .sleep-step {
+        min-height: 44px;
+      }
+
       .post-game-card {
         padding: 8px 12px;
       }
@@ -2469,10 +2595,16 @@
       </div>
       <div class="checkin-section">
         <strong>어젯밤 수면시간은 어느 정도였나요?</strong>
-        <div class="checkin-options" role="group" aria-label="수면시간">
-          <button type="button" data-sleep="4시간 이하">4시간 이하</button>
-          <button type="button" data-sleep="4~8시간">4~8시간</button>
-          <button type="button" data-sleep="8시간 이상">8시간 이상</button>
+        <div class="sleep-dial" role="group" aria-label="수면시간">
+          <div class="sleep-window" aria-live="polite">
+            <span id="sleepPrevValue" class="sleep-neighbor">9시간</span>
+            <strong id="sleepValue">8시간</strong>
+            <span id="sleepNextValue" class="sleep-neighbor">7시간</span>
+          </div>
+          <div class="sleep-controls">
+            <button id="sleepUpButton" class="sleep-step" type="button" aria-label="수면시간 늘리기">▲</button>
+            <button id="sleepDownButton" class="sleep-step" type="button" aria-label="수면시간 줄이기">▼</button>
+          </div>
         </div>
       </div>
       <div class="modal-actions single-action">
@@ -2683,6 +2815,11 @@
     const themeOptionButtons = [...document.querySelectorAll("[data-theme-option]")];
     const moodButtons = [...document.querySelectorAll("[data-mood]")];
     const sleepButtons = [...document.querySelectorAll("[data-sleep]")];
+    const sleepPrevValue = document.getElementById("sleepPrevValue");
+    const sleepValue = document.getElementById("sleepValue");
+    const sleepNextValue = document.getElementById("sleepNextValue");
+    const sleepUpButton = document.getElementById("sleepUpButton");
+    const sleepDownButton = document.getElementById("sleepDownButton");
     const checkinNextButton = document.getElementById("checkinNextButton");
     const postMoodButtons = [...document.querySelectorAll("[data-post-mood]")];
     const postDifficultyButtons = [...document.querySelectorAll("[data-post-difficulty]")];
@@ -2743,8 +2880,10 @@
     let musicEnabled = true;
     let soundEnabled = true;
     let voiceEnabled = true;
+    const sleepHourOptions = [4, 5, 6, 7, 8, 9, 10, 11, 12];
     let todayMood = "";
-    let sleepTime = "";
+    let sleepHourIndex = 4;
+    let sleepTime = `${sleepHourOptions[sleepHourIndex]}시간`;
     let postMood = "";
     let postDifficulty = "";
     let postFatigue = "";
@@ -2853,12 +2992,32 @@
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
       });
-      sleepButtons.forEach((button) => {
-        const active = button.dataset.sleep === sleepTime;
-        button.classList.toggle("active", active);
-        button.setAttribute("aria-pressed", String(active));
-      });
+      updateSleepDial();
       checkinNextButton.disabled = !(todayMood && sleepTime);
+    }
+
+    function updateSleepDial() {
+      const currentHour = sleepHourOptions[sleepHourIndex];
+      sleepTime = `${currentHour}시간`;
+
+      if (!sleepValue || !sleepPrevValue || !sleepNextValue) return;
+
+      const upperHour = sleepHourOptions[sleepHourIndex + 1];
+      const lowerHour = sleepHourOptions[sleepHourIndex - 1];
+      sleepPrevValue.textContent = upperHour ? `${upperHour}시간` : "";
+      sleepValue.textContent = sleepTime;
+      sleepNextValue.textContent = lowerHour ? `${lowerHour}시간` : "";
+
+      if (sleepDownButton) sleepDownButton.disabled = sleepHourIndex === 0;
+      if (sleepUpButton) sleepUpButton.disabled = sleepHourIndex === sleepHourOptions.length - 1;
+    }
+
+    function changeSleepHour(step) {
+      const nextIndex = Math.max(0, Math.min(sleepHourOptions.length - 1, sleepHourIndex + step));
+      if (nextIndex === sleepHourIndex) return;
+      sleepHourIndex = nextIndex;
+      updateCheckinButtons();
+      speakGuide(`수면시간은 ${sleepTime}으로 선택했습니다.`);
     }
 
     function updatePostGameButtons() {
@@ -4006,13 +4165,12 @@
         speakGuide(`오늘 기분은 ${todayMood}으로 선택했습니다.`);
       });
     });
-    sleepButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        sleepTime = button.dataset.sleep;
-        updateCheckinButtons();
-        speakGuide(`수면시간은 ${sleepTime}으로 선택했습니다.`);
-      });
-    });
+    if (sleepUpButton) {
+      sleepUpButton.addEventListener("click", () => changeSleepHour(1));
+    }
+    if (sleepDownButton) {
+      sleepDownButton.addEventListener("click", () => changeSleepHour(-1));
+    }
     checkinNextButton.addEventListener("click", () => {
       if (!todayMood || !sleepTime) return;
       showDifficultyScreen();
