@@ -598,6 +598,14 @@
       margin-top: clamp(4px, .8vh, 10px);
     }
 
+    .post-game-page {
+      display: grid;
+    }
+
+    .post-game-page.is-hidden {
+      display: none;
+    }
+
     .difficulty-choice {
       display: grid;
       grid-template-rows: auto auto auto;
@@ -2617,6 +2625,7 @@
     <div class="modal-card checkin-card post-game-card">
       <h2 id="postGameTitle">마무리 상태를 알려주세요.</h2>
       <span class="checkin-note">오늘 활동을 마친 뒤의 느낌을 가볍게 확인합니다.</span>
+      <div id="postGamePageOne" class="post-game-page">
       <div class="checkin-section">
         <strong>지금 기분은 어떠세요?</strong>
         <div class="checkin-options" role="group" aria-label="종료 후 기분">
@@ -2641,6 +2650,8 @@
           <button type="button" data-post-fatigue="많이 피곤해요">많이 피곤해요</button>
         </div>
       </div>
+      </div>
+      <div id="postGamePageTwo" class="post-game-page is-hidden">
       <div class="checkin-section">
         <strong>도움이 필요했나요?</strong>
         <div class="checkin-options two-options" role="group" aria-label="도움 필요 여부">
@@ -2655,8 +2666,9 @@
           <button type="button" data-post-replay="아니오">아니오</button>
         </div>
       </div>
+      </div>
       <div class="modal-actions single-action">
-        <button id="postGameNextButton" class="primary" type="button" disabled>결과 보기</button>
+        <button id="postGameNextButton" class="primary" type="button" disabled>다음</button>
       </div>
     </div>
   </div>
@@ -2827,6 +2839,8 @@
     const postHelpButtons = [...document.querySelectorAll("[data-post-help]")];
     const postReplayButtons = [...document.querySelectorAll("[data-post-replay]")];
     const postGameNextButton = document.getElementById("postGameNextButton");
+    const postGamePageOne = document.getElementById("postGamePageOne");
+    const postGamePageTwo = document.getElementById("postGamePageTwo");
     const skipTutorialButton = document.getElementById("skipTutorialButton");
     const tutorialNextButton = document.getElementById("tutorialNextButton");
     const tutorialPageText = document.getElementById("tutorialPageText");
@@ -2889,6 +2903,7 @@
     let postFatigue = "";
     let postHelpNeeded = "";
     let postReplayWanted = "";
+    let postGamePage = 1;
     let tutorialReturnTarget = "difficulty";
     let tutorialStepIndex = 0;
     let currentPhase = "home";
@@ -3046,7 +3061,16 @@
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", String(active));
       });
-      postGameNextButton.disabled = !(postMood && postDifficulty && postFatigue && postHelpNeeded && postReplayWanted);
+      renderPostGamePage();
+    }
+
+    function renderPostGamePage() {
+      if (postGamePageOne) postGamePageOne.classList.toggle("is-hidden", postGamePage !== 1);
+      if (postGamePageTwo) postGamePageTwo.classList.toggle("is-hidden", postGamePage !== 2);
+      postGameNextButton.textContent = postGamePage === 1 ? "다음" : "나가기";
+      postGameNextButton.disabled = postGamePage === 1
+        ? !(postMood && postDifficulty && postFatigue)
+        : !(postHelpNeeded && postReplayWanted);
     }
 
     function resetPostGameState() {
@@ -3055,6 +3079,7 @@
       postFatigue = "";
       postHelpNeeded = "";
       postReplayWanted = "";
+      postGamePage = 1;
       updatePostGameButtons();
     }
 
@@ -3713,6 +3738,17 @@
       });
     }
 
+    function completePostGameAndExit() {
+      clearPreviewTimer();
+      clearHintTimer();
+      clearRoundTimer();
+      clearBetweenTimer();
+      sendCompletedResult();
+      postGameModal.classList.remove("open");
+      resetToHome();
+      showIntroScreen();
+    }
+
     function finishRound(doneMessage, reason = "unknown") {
       closeRoundTelemetry(reason);
       clearRoundTimer();
@@ -4207,7 +4243,13 @@
     });
     postGameNextButton.addEventListener("click", () => {
       if (postGameNextButton.disabled) return;
-      showResultScreen();
+      if (postGamePage === 1) {
+        postGamePage = 2;
+        updatePostGameButtons();
+        speakGuide("마지막으로 도움이 필요했는지와 다시 하고 싶은지 알려주세요.");
+        return;
+      }
+      completePostGameAndExit();
     });
     skipTutorialButton.addEventListener("click", () => {
       closeTutorial();
